@@ -34,7 +34,7 @@ class AdminController extends Controller
         $revenue = (clone $paid)->sum('total');
         $cost = (clone $paid)->sum('cost_total');
         $expense = Expense::sum('amount');
-        return view('admin.dashboard', compact('revenue', 'cost', 'expense') + ['productCount' => Product::count(), 'orderCount' => Order::count(), 'recent' => Order::latest()->take(8)->get()]);
+        return view('admin.dashboard', compact('revenue', 'cost', 'expense') + ['productCount' => Product::count(), 'orderCount' => Order::count(), 'recent' => Order::orderByRaw("CASE WHEN status = 'completed' THEN 1 ELSE 0 END")->latest('created_at')->latest('id')->take(8)->get()]);
     }
     public function products()
     {
@@ -65,7 +65,7 @@ class AdminController extends Controller
     }
     public function orders()
     {
-        return view('admin.orders', ['orders' => Order::with('items')->latest()->paginate(20)]);
+        return view('admin.orders', ['orders' => Order::with('items')->orderByRaw("CASE WHEN status = 'completed' THEN 1 ELSE 0 END")->latest('created_at')->latest('id')->paginate(20)]);
     }
     public function updateOrder(Request $r, Order $order)
     {

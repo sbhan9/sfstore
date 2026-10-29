@@ -10,19 +10,19 @@ class StoreSeeder extends Seeder
 {
     public function run(): void
     {
-        $email = env('SSTORE_ADMIN_EMAIL');
-        $password = env('SSTORE_ADMIN_PASSWORD');
+        $email = env('SFTORE_ADMIN_EMAIL');
+        $password = env('SFTORE_ADMIN_PASSWORD');
 
         if (!$email || !$password || strlen($password) < 5) {
             throw new \RuntimeException(
-                'Atur SSTORE_ADMIN_EMAIL dan SSTORE_ADMIN_PASSWORD minimal 12 karakter di .env.'
+                'Atur SFTORE_ADMIN_EMAIL dan SFTORE_ADMIN_PASSWORD minimal 5 karakter di .env.'
             );
         }
 
         User::updateOrCreate(
             ['email' => $email],
             [
-                'name' => 'Admin SStore',
+                'name' => 'Admin SFtore',
                 'password' => Hash::make($password),
             ]
         );

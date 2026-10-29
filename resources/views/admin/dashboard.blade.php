@@ -145,7 +145,8 @@
                 </h3>
 
                 <p class="mt-1 text-xs text-slate-500">
-                    Pantau pesanan terbaru yang masuk ke SFStore.
+                    Pantau pesanan terbaru yang masuk ke SFStore. Status pembayaran dan pesanan
+                    bisa langsung diubah dari dropdown tanpa membuka halaman lain.
                 </p>
             </div>
 
@@ -179,6 +180,9 @@
                         <th class="px-6 py-4 font-semibold">
                             Status
                         </th>
+                        <th class="px-6 py-4 text-center font-semibold">
+                            Aksi
+                        </th>
                     </tr>
                 </thead>
 
@@ -186,11 +190,42 @@
 
                     @forelse ($recent as $o)
                         @php
-                            $paid = in_array(strtolower((string) $o->payment_status), ['paid', 'lunas']);
-
-                            $paymentLabel = $paid ? 'Lunas' : 'Belum Lunas';
-
                             $orderStatus = strtolower((string) $o->status);
+
+                            $paymentLabels = [
+                                'unpaid' => 'Belum Bayar',
+                                'paid' => 'Lunas',
+                                'refunded' => 'Refund',
+                            ];
+
+                            $paymentColors = [
+                                'unpaid' => 'bg-amber-50 text-amber-700',
+                                'paid' => 'bg-green-50 text-green-700',
+                                'refunded' => 'bg-red-50 text-red-700',
+                            ];
+
+                            $orderLabels = [
+                                'new' => 'Baru',
+                                'processing' => 'Diproses',
+                                'completed' => 'Selesai',
+                                'cancelled' => 'Dibatalkan',
+                            ];
+
+                            $statusColors = [
+                                'new' => 'bg-blue-50 text-blue-700',
+                                'processing' => 'bg-indigo-50 text-indigo-700',
+                                'completed' => 'bg-green-50 text-green-700',
+                                'cancelled' => 'bg-slate-100 text-slate-600',
+                            ];
+
+                            $phone = preg_replace('/\D/', '', $o->customer_phone ?? '');
+
+                            if (str_starts_with($phone, '0')) {
+                                $phone = '62' . substr($phone, 1);
+                            }
+
+                            $waMessage = "Halo {$o->customer_name}, terkait pesanan {$o->code} di SFStore.";
+                            $waUrl = $phone ? 'https://wa.me/' . $phone . '?text=' . rawurlencode($waMessage) : null;
                         @endphp
 
                         <tr class="transition hover:bg-slate-50">
@@ -221,32 +256,87 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                <span
-                                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold
-                                    {{ $paid ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700' }}">
 
-                                    {{ $paymentLabel }}
+                                <!-- Ubah status pembayaran langsung -->
+                                <form method="POST" action="{{ route('admin.orders.update', $o) }}">
+                                    @csrf
+                                    @method('PATCH')
 
-                                </span>
+                                    <input type="hidden" name="status" value="{{ $o->status }}">
+
+                                    <select name="payment_status" onchange="this.form.submit()"
+                                        title="Ubah status pembayaran"
+                                        class="cursor-pointer rounded-full border border-transparent px-3 py-1 text-xs font-semibold outline-none transition
+                                            {{ $paymentColors[$o->payment_status] ?? 'bg-slate-100 text-slate-600' }}
+                                            hover:ring-2 hover:ring-red-100 focus:border-red-500">
+
+                                        @foreach ($paymentLabels as $value => $label)
+                                            <option value="{{ $value }}" @selected($o->payment_status === $value)>
+                                                {{ $label }}
+                                            </option>
+                                        @endforeach
+
+                                    </select>
+
+                                </form>
+
                             </td>
 
                             <td class="px-6 py-4">
-                                <span
-                                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold
-                                    {{ in_array($orderStatus, ['completed', 'selesai'])
-                                        ? 'bg-green-50 text-green-700'
-                                        : 'bg-slate-100 text-slate-600' }}">
 
-                                    {{ ucfirst(str_replace('_', ' ', $o->status)) }}
+                                <!-- Ubah status pesanan langsung -->
+                                <form method="POST" action="{{ route('admin.orders.update', $o) }}">
+                                    @csrf
+                                    @method('PATCH')
 
-                                </span>
+                                    <input type="hidden" name="payment_status" value="{{ $o->payment_status }}">
+
+                                    <select name="status" onchange="this.form.submit()"
+                                        title="Ubah status pesanan"
+                                        class="cursor-pointer rounded-full border border-transparent px-3 py-1 text-xs font-semibold outline-none transition
+                                            {{ $statusColors[$orderStatus] ?? 'bg-slate-100 text-slate-600' }}
+                                            hover:ring-2 hover:ring-red-100 focus:border-red-500">
+
+                                        @foreach ($orderLabels as $value => $label)
+                                            <option value="{{ $value }}" @selected($orderStatus === $value)>
+                                                {{ $label }}
+                                            </option>
+                                        @endforeach
+
+                                    </select>
+
+                                </form>
+
+                            </td>
+
+                            <!-- Aksi -->
+                            <td class="px-6 py-4 text-center">
+
+                                @if ($waUrl)
+                                    <a href="{{ $waUrl }}" target="_blank" rel="noopener noreferrer"
+                                        title="Hubungi pelanggan via WhatsApp"
+                                        class="inline-flex items-center justify-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 transition hover:bg-green-100">
+
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"
+                                            viewBox="0 0 24 24">
+                                            <path
+                                                d="M21 11.5a8.4 8.4 0 0 1-.9 3.8A8.5 8.5 0 0 1 12.5 20a8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 12.5 3 8.5 8.5 0 0 1 21 11.5z" />
+                                        </svg>
+
+                                        WhatsApp
+
+                                    </a>
+                                @else
+                                    <span class="text-xs text-slate-400">—</span>
+                                @endif
+
                             </td>
 
                         </tr>
 
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-14 text-center">
+                            <td colspan="6" class="px-6 py-14 text-center">
 
                                 <div
                                     class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">

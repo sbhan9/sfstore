@@ -74,7 +74,7 @@
                         class="absolute -right-1.5 -top-1.5 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">0</span>
                 </button>
                 <a href="{{ route('login') }}"
-                    class="rounded-xl bg-red-600 px-4 py-3 text-xs font-bold text-white transition hover:bg-red-700 sm:text-sm">Admin</a>
+                    class="rounded-xl bg-red-600 px-4 py-3 text-xs font-bold text-white transition hover:bg-red-700 sm:text-sm">Login</a>
             </div>
         </div>
         <div class="px-4 pb-3 sm:hidden">
@@ -131,11 +131,11 @@
             <div id="categories"
                 class="mt-4 flex gap-2 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <button type="button" data-category="Semua" aria-pressed="true"
-                    class="category shrink-0 whitespace-nowrap rounded-full border border-red-600 bg-red-600 px-5 py-2.5 text-xs font-bold text-white transition sm:text-sm">Semua
+                    class="category shrink-0 whitespace-nowrap rounded-full border border-slate-200 cursor-pointer text-gray-800 bg-white px-5 py-2.5 text-xs font-semibold text-slate-600 transition hover:bg-red-600 hover:border-red-300 hover:text-white sm:text-sm">Semua
                     Produk</button>
                 @foreach ($categories as $cat)
                     <button type="button" data-category="{{ $cat }}" aria-pressed="false"
-                        class="category shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-5 py-2.5 text-xs font-semibold text-slate-600 transition hover:border-red-300 hover:text-red-600 sm:text-sm">{{ $cat }}</button>
+                        class="category shrink-0 whitespace-nowrap rounded-full border border-slate-200 cursor-pointer text-gray-800 bg-white px-5 py-2.5 text-xs font-semibold text-slate-600 transition hover:bg-red-600 hover:border-red-300 hover:text-white sm:text-sm">{{ $cat }}</button>
                 @endforeach
             </div>
         </section>
@@ -202,7 +202,7 @@
                                 <p class="break-words text-base font-black tracking-tight text-red-600 sm:text-lg">
                                     Rp{{ number_format($product->price, 0, ',', '.') }}</p>
                                 <button type="button" data-add="{{ $product->id }}"
-                                    class="mt-3 flex w-full items-center justify-center gap-1 rounded-xl border border-red-600 bg-red-600 px-2 py-2.5 text-[11px] font-bold text-white transition hover:bg-white hover:text-red-600 sm:text-sm">+
+                                    class="mt-3 flex w-full items-center justify-center cursor-pointer gap-1 rounded-xl border border-red-600 bg-red-600 px-2 py-2.5 text-[11px] font-bold text-white transition hover:bg-white hover:text-red-600 sm:text-sm">+
                                     Keranjang</button>
                             </div>
                         </div>
@@ -292,7 +292,7 @@
                 <h3 class="font-bold text-white">Informasi</h3>
                 <p class="mt-3 text-sm leading-6 text-slate-400">Order tersimpan saat checkout. Pembayaran dikonfirmasi
                     manual melalui admin.</p><a href="{{ route('login') }}"
-                    class="mt-3 inline-flex text-sm font-semibold text-red-400 hover:text-red-300">Masuk Admin ↗</a>
+                    class="mt-3 inline-flex text-sm font-semibold text-red-400 hover:text-red-300">Masuk Portal ↗</a>
             </div>
         </div>
         <div class="mx-auto mt-8 max-w-7xl border-t border-white/10 pt-5 text-xs text-slate-500">© {{ date('Y') }}
